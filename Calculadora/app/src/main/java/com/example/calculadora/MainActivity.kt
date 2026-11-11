@@ -52,17 +52,45 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Vistas () {
+    // Estado para controlar la pantalla actual
     var pantalla by remember { mutableStateOf(1) } // Estado para controlar la pantalla actual
+
+    // Variables para almacenar los datos del formulario
+    var edad by remember {mutableStateOf("")} // Estado para la edad
+    var numeroDePagas by remember {mutableStateOf("")}
+    var onNumeroDePagasChange: (String) -> Unit
+    var salarioBruto by remember {mutableStateOf("")}
+    var onSalarioBrutoChange: (String) -> Unit // Función para actualizar el salario bruto
+    var numeroHijos by remember { mutableStateOf("") }
+    var onNumeroHijosChange: (String) -> Unit
+    var gradoDiscapacidad by remember { mutableStateOf("") }
+    var onGradoDiscapacidadChange: (String) -> Unit
+    var grupoProfesional by remember { mutableStateOf("") }
+    var onGrupoProfesionalChange: (String) -> Unit
+    var estadoCivil by remember { mutableStateOf("") }
+    var onEstadoCivilChange: (String) -> Unit
+
     when (pantalla) {
         1 -> BienvenidaView(cambioPantalla = { pantalla = 2 })
-        2 -> FormularioView(onCalcularClick = { pantalla = 3 })
+        2 -> FormularioView(
+            // Llamada a la función FormularioView con los parámetros correspondientes
+            edad = edad, onEdadChange = { edad = it },
+            numeroDePagas = numeroDePagas, onNumeroDePagasChange = { numeroDePagas = it },
+            salarioBruto = salarioBruto, onSalarioBrutoChange = { salarioBruto = it },
+            numeroHijos = numeroHijos, onNumeroHijosChange = { numeroHijos = it },
+            gradoDiscapacidad = gradoDiscapacidad, onGradoDiscapacidadChange = { gradoDiscapacidad = it },
+            grupoProfesional = grupoProfesional, onGrupoProfesionalChange = { grupoProfesional = it },
+            estadoCivil = estadoCivil, onEstadoCivilChange = { estadoCivil = it },
+
+            onCalcularClick = { pantalla = 3 })
         3 -> ResultView()
-    }
+     }
     }
 
 
 @Composable
-fun BienvenidaView (cambioPantalla : () -> Unit,modifier: Modifier = Modifier) {
+fun BienvenidaView (cambioPantalla : () -> Unit, // Función para cambiar de pantalla
+                    modifier: Modifier = Modifier) {
     // Se ejecuta cuando se muestra la pantalla de bienvenida
     LaunchedEffect(Unit) {
         delay (2000) // Espera 2 segundos
@@ -85,31 +113,16 @@ fun BienvenidaView (cambioPantalla : () -> Unit,modifier: Modifier = Modifier) {
 
 
 @Composable
-fun FormularioView (onCalcularClick: () -> Unit) {
-    var edad by remember {mutableStateOf("")} // Estado para la edad
-    var onEdadChange: (String) -> Unit // Función para actualizar la edad
-    edad.toIntOrNull() ?: 0          // Convierte la edad a un número o usa 0 si no es un número válido
-    var numeroDePagas by remember {mutableStateOf("")}
-    var onNumeroDePagasChange: (String) -> Unit
-    numeroDePagas.toIntOrNull() ?: 0
-    var salarioBruto by remember {mutableStateOf("")}
-    var onSalarioBrutoChange: (String) -> Unit // Función para actualizar el salario bruto
-    salarioBruto.toIntOrNull() ?: 0   // Convierte el salario bruto a un número o usa 0 si no es un número válido
-    var numeroHijos by remember { mutableStateOf("") }
-    var onNumeroHijosChange: (String) -> Unit
-    numeroHijos.toIntOrNull() ?: 0 // Convierte la edad a un número o usa 0 si no es un número válido
-    var gradoDiscapacidad by remember { mutableStateOf("") }
-    var onGradoDiscapacidadChange: (String) -> Unit
-    gradoDiscapacidad.toIntOrNull() ?: 0
-    var grupoProfesional by remember { mutableStateOf("") }
-    var onGrupoProfesionalChange: (String) -> Unit
-    var estadoCivil by remember { mutableStateOf("") }
-    var onEstadoCivilChange: (String) -> Unit
-    estadoCivil.toIntOrNull() ?: 0
+fun FormularioView (edad: String, onEdadChange: (String) -> Unit,
+                    numeroDePagas: String, onNumeroDePagasChange: (String) -> Unit,
+                    salarioBruto: String, onSalarioBrutoChange: (String) -> Unit,
+                    numeroHijos: String, onNumeroHijosChange: (String) -> Unit,
+                    gradoDiscapacidad: String, onGradoDiscapacidadChange: (String) -> Unit,
+                    grupoProfesional: String, onGrupoProfesionalChange: (String) -> Unit,
+                    estadoCivil: String, onEstadoCivilChange: (String) -> Unit,
+                    onCalcularClick: () -> Unit ) { // Función para manejar el clic en el botón "Calcular"
 
-
-
-
+    // Vista del formulario
     Column (
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -124,7 +137,7 @@ fun FormularioView (onCalcularClick: () -> Unit) {
         OutlinedTextField(
 
             value = edad,
-            onValueChange = { edad = it }, // Actualiza la edad cuando el valor cambia
+            onValueChange = onEdadChange, // Llamada a la función onEdadChange de Vista()
             label = { Text("Tu edad") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Permite solo números
         )
@@ -132,41 +145,41 @@ fun FormularioView (onCalcularClick: () -> Unit) {
         OutlinedTextField(
             value = numeroDePagas,
             label = {Text("Total de pagas al año")},
-            onValueChange = {numeroDePagas = it},
+            onValueChange = onNumeroDePagasChange, // Llamada a la función onNumeroDePagasChange de Vista()
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
         OutlinedTextField(
             value = salarioBruto,
             label = {Text("Salario Bruto Anual")},
-            onValueChange = {salarioBruto = it},
+            onValueChange = onSalarioBrutoChange,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
         OutlinedTextField(
             value = numeroHijos,
             label = {Text("Número de Hijos")},
-            onValueChange = {numeroHijos = it},
+            onValueChange = onNumeroHijosChange,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
         OutlinedTextField(
             value = gradoDiscapacidad,
             label = {Text("Grado de Discapacidad")},
-            onValueChange = {gradoDiscapacidad = it},
+            onValueChange = onGradoDiscapacidadChange,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         OutlinedTextField(
             value = grupoProfesional,
             label = {Text("Grupo Profesional")},
-            onValueChange = {grupoProfesional = it},
+            onValueChange = onGrupoProfesionalChange,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
 
         OutlinedTextField(
             value = estadoCivil,
             label = {Text("Estado Civil")},
-            onValueChange = {estadoCivil = it},
+            onValueChange = onEstadoCivilChange,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
 
