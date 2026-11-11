@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Calculadora</string>
+    <string name="titulo_salario_bruto">Salario Bruto</string>
+    <string name="titulo_salario_neto">Salario Neto</string>
+    <string name ="titulo_deducciones">Deducciones</string>
+    <string name="titulo_retencion_irpf">Retencion IRPF</string>
+    <string name="mensaje_bienvenida">Bienvenido a la calculadora salarial</string>
+    <string name="titulo_vista_formulario">Introduce los datos necesarios para calcular tu salario</string>
 </resources>
