@@ -199,6 +199,7 @@ fun FormularioView (edad: String, onEdadChange: (String) -> Unit,
 
 
 
+// Calculo de retencion IRPF
 private fun retencionIrpf (salarioAnual: Double): Double {
     var irpf = 0.0
 
@@ -219,6 +220,28 @@ private fun retencionIrpf (salarioAnual: Double): Double {
     return irpf
 }
 
+// Calculo de las deducciones
+private fun calculoDuccionesDiscapacidad (gradoDiscapacidad: Int): Double {
+    var deduccionesDiscapacidad = 0.0
+    when (gradoDiscapacidad) {
+        in 15..30 -> deduccionesDiscapacidad = 0.15
+        in 31..50 -> deduccionesDiscapacidad = 0.30
+        in 51..100 -> deduccionesDiscapacidad = 0.45
+    }
+    return deduccionesDiscapacidad
+}
+
+private fun calculoDeduccionesHijo (numeroHijos: Int): Double {
+    var deduccionesHijo = 0.0
+    when (numeroHijos) {
+        in 1..2 -> deduccionesHijo = 0.05
+        in 3..5 -> deduccionesHijo = 0.10
+        in 6..10 -> deduccionesHijo = 0.15
+    }
+    return deduccionesHijo
+    }
+
+
 
 @Composable
  fun ResultView (edad: Int, salarioBruto: Double,
@@ -235,6 +258,13 @@ private fun retencionIrpf (salarioAnual: Double): Double {
      val irpfMensual = aPagar / numeroDePagas
      val salarioNeto = (salarioAnual / numeroDePagas) - irpfMensual
 
+    // Aplicar deducciones
+    val deducionDiscapacidad = calculoDuccionesDiscapacidad(gradoDiscapacidad)
+    val deduccionHijos = calculoDeduccionesHijo(numeroHijos)
+    val deducciones = deducionDiscapacidad + deduccionHijos
+    // Suponemos que las deducciones son un porcentaje del salario neto y lo sumamos al salario neto por ser una "ayuda" al trabajador
+    val salarioNetoConDeducciones = salarioNeto + (salarioNeto * deducciones)
+
 
 
 
@@ -244,12 +274,12 @@ private fun retencionIrpf (salarioAnual: Double): Double {
             CuadranteInfo(
                 titulo =  stringResource(R.string.titulo_salario_bruto),
                 descripcion = ("$salarioAnual €"), // Muestra el salario anual
-                colorFondo = Color(0xFFEADDFF),
+                colorFondo = Color(0xFFEADDFB),
                 modifier = Modifier.weight(1f)
             )
             CuadranteInfo(
                 titulo = stringResource(R.string.titulo_salario_neto),
-                descripcion = salarioNeto.toString(),
+                descripcion = salarioNetoConDeducciones.toString() + "€", // Muestra el salario neto con deducciones
                 colorFondo = Color(0xFFD0BCFF),
                 modifier = Modifier.weight(1f)
 
@@ -265,7 +295,8 @@ private fun retencionIrpf (salarioAnual: Double): Double {
             )
             CuadranteInfo(
                 titulo = stringResource(R.string.titulo_deducciones),
-                descripcion = "Caracola",
+                descripcion = ("Por incapacidad $deducciones%." +
+                        " Por hijos $deduccionHijos%."),
                 colorFondo = Color(0xFFF6EDFF),
                 modifier = Modifier.weight(1f)
             )
