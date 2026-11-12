@@ -58,17 +58,11 @@ fun Vistas () {
     // Variables para almacenar los datos del formulario
     var edad by remember {mutableStateOf("")} // Estado para la edad
     var numeroDePagas by remember {mutableStateOf("")}
-    var onNumeroDePagasChange: (String) -> Unit
     var salarioBruto by remember {mutableStateOf("")}
-    var onSalarioBrutoChange: (String) -> Unit // Función para actualizar el salario bruto
     var numeroHijos by remember { mutableStateOf("") }
-    var onNumeroHijosChange: (String) -> Unit
     var gradoDiscapacidad by remember { mutableStateOf("") }
-    var onGradoDiscapacidadChange: (String) -> Unit
     var grupoProfesional by remember { mutableStateOf("") }
-    var onGrupoProfesionalChange: (String) -> Unit
     var estadoCivil by remember { mutableStateOf("") }
-    var onEstadoCivilChange: (String) -> Unit
 
     when (pantalla) {
         1 -> BienvenidaView(cambioPantalla = { pantalla = 2 })
@@ -83,7 +77,15 @@ fun Vistas () {
             estadoCivil = estadoCivil, onEstadoCivilChange = { estadoCivil = it },
 
             onCalcularClick = { pantalla = 3 })
-        3 -> ResultView()
+        3 -> ResultView(
+            edad = edad.toIntOrNull() ?: 0,
+            salarioBruto = salarioBruto.toDoubleOrNull() ?:0.0,  // convierte a double o 0.0 si no es posible
+            numeroDePagas = numeroDePagas.toIntOrNull() ?: 0,
+            numeroHijos = numeroHijos.toIntOrNull() ?: 0,
+            gradoDiscapacidad = gradoDiscapacidad.toIntOrNull() ?: 0,
+            grupoProfesional = grupoProfesional,
+            estadoCivil = estadoCivil
+        )
      }
     }
 
@@ -151,7 +153,7 @@ fun FormularioView (edad: String, onEdadChange: (String) -> Unit,
 
         OutlinedTextField(
             value = salarioBruto,
-            label = {Text("Salario Bruto Anual")},
+            label = {Text("Salario Bruto Mensual")},
             onValueChange = onSalarioBrutoChange,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
@@ -197,30 +199,67 @@ fun FormularioView (edad: String, onEdadChange: (String) -> Unit,
 
 
 
+private fun retencionIrpf (salarioAnual: Double): Double {
+    var irpf = 0.0
+
+    if (salarioAnual <= 12450) {
+        irpf = 0.19
+    } else if (salarioAnual > 12450 && salarioAnual <= 20200) {
+       irpf = 0.24
+    } else if (salarioAnual > 20200 && salarioAnual <= 35200) {
+        irpf = 0.30
+    } else if (salarioAnual > 35200 && salarioAnual <= 60000) {
+        irpf = 0.37
+    } else if (salarioAnual > 60000 && salarioAnual <= 300000) {
+        irpf = 0.45
+    } else {
+        irpf = 0.47
+    }
+
+    return irpf
+}
+
+
 @Composable
- fun ResultView () {
+ fun ResultView (edad: Int, salarioBruto: Double,
+                 numeroDePagas: Int, numeroHijos: Int,
+                 gradoDiscapacidad: Int, grupoProfesional: String,
+                 estadoCivil: String, modifier: Modifier = Modifier) {
 
-    Column(Modifier.fillMaxWidth()) {
+     // Hacer calculos
+     val salarioAnual = salarioBruto * numeroDePagas
+     val irpf = retencionIrpf(salarioAnual)
+     val irpfPorcentaje = irpf * 100
+     val aPagar = salarioAnual * irpf
 
-        Row (Modifier.weight(1f)) {
+     val irpfMensual = aPagar / numeroDePagas
+     val salarioNeto = (salarioAnual / numeroDePagas) - irpfMensual
+
+
+
+
+    Column(Modifier.fillMaxWidth()) {   // Column para el contenido
+
+        Row (Modifier.weight(1f)) {    // Row para los cuadrantes de la parte superior
             CuadranteInfo(
                 titulo =  stringResource(R.string.titulo_salario_bruto),
-                descripcion = stringResource(R.string.titulo_salario_bruto),
+                descripcion = ("$salarioAnual €"), // Muestra el salario anual
                 colorFondo = Color(0xFFEADDFF),
                 modifier = Modifier.weight(1f)
             )
             CuadranteInfo(
                 titulo = stringResource(R.string.titulo_salario_neto),
-                descripcion = stringResource(R.string.titulo_salario_neto),
+                descripcion = salarioNeto.toString(),
                 colorFondo = Color(0xFFD0BCFF),
                 modifier = Modifier.weight(1f)
 
             )
         }
-        Row (Modifier.weight(1f)) {
-            CuadranteInfo(
+        Row (Modifier.weight(1f)) {    // Row para los cuadrantes de la parte inferior
+            CuadranteInfo (
                 titulo = stringResource(R.string.titulo_retencion_irpf),
-                descripcion = "Hola",
+                descripcion =("Se le retenerá un $irpfPorcentaje%." +
+                        " Total a pagar $aPagar€"),
                 colorFondo = Color(0xFFB69DF8),
                 modifier = Modifier.weight(1f)
             )
