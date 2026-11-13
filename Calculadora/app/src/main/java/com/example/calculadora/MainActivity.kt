@@ -53,10 +53,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Vistas () {
     // Estado para controlar la pantalla actual
-    var pantalla by remember { mutableStateOf(1) } // Estado para controlar la pantalla actual
+    var pantalla by remember { mutableStateOf(1) }
 
     // Variables para almacenar los datos del formulario
-    var edad by remember {mutableStateOf("")} // Estado para la edad
+    var edad by remember {mutableStateOf("")}               // Estado para la edad
     var numeroDePagas by remember {mutableStateOf("")}
     var salarioBruto by remember {mutableStateOf("")}
     var numeroHijos by remember { mutableStateOf("") }
@@ -93,16 +93,21 @@ fun Vistas () {
 @Composable
 fun BienvenidaView (cambioPantalla : () -> Unit, // Función para cambiar de pantalla
                     modifier: Modifier = Modifier) {
+
     // Se ejecuta cuando se muestra la pantalla de bienvenida
     LaunchedEffect(Unit) {
-        delay (2000) // Espera 2 segundos
-        cambioPantalla () // Cambia a la pantalla de inicio
+        delay (2000)    // Espera 2 segundos
+        cambioPantalla ()         // Cambia a la pantalla de inicio
     }
+
+    // Vista de la pantalla de bienvenida
+    // Column para el contenido
     Column( modifier = modifier
         .fillMaxSize()
         .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
+        // Texto de bienvenida
         Text(
             text = stringResource(R.string.mensaje_bienvenida),
             modifier = Modifier.padding(bottom = 16.dp),
@@ -115,14 +120,14 @@ fun BienvenidaView (cambioPantalla : () -> Unit, // Función para cambiar de pan
 
 
 @Composable
-fun FormularioView (edad: String, onEdadChange: (String) -> Unit,
+fun FormularioView (edad: String, onEdadChange: (String) -> Unit,   // Función para manejar los cambios en la edad
                     numeroDePagas: String, onNumeroDePagasChange: (String) -> Unit,
                     salarioBruto: String, onSalarioBrutoChange: (String) -> Unit,
                     numeroHijos: String, onNumeroHijosChange: (String) -> Unit,
                     gradoDiscapacidad: String, onGradoDiscapacidadChange: (String) -> Unit,
                     grupoProfesional: String, onGrupoProfesionalChange: (String) -> Unit,
                     estadoCivil: String, onEstadoCivilChange: (String) -> Unit,
-                    onCalcularClick: () -> Unit ) { // Función para manejar el clic en el botón "Calcular"
+                    onCalcularClick: () -> Unit ) {             // Función para manejar el clic en el botón "Calcular"
 
     // Vista del formulario
     Column (
@@ -200,7 +205,7 @@ fun FormularioView (edad: String, onEdadChange: (String) -> Unit,
 
 
 // Calculo de retencion IRPF
-private fun retencionIrpf (salarioAnual: Double): Double {
+internal fun retencionIrpf (salarioAnual: Double): Double {
     var irpf = 0.0
 
     if (salarioAnual <= 12450) {
@@ -221,7 +226,7 @@ private fun retencionIrpf (salarioAnual: Double): Double {
 }
 
 // Calculo de las deducciones
-private fun calculoDuccionesDiscapacidad (gradoDiscapacidad: Int): Double {
+internal fun calculoDuccionesDiscapacidad (gradoDiscapacidad: Int): Double {
     var deduccionesDiscapacidad = 0.0
     when (gradoDiscapacidad) {
         in 15..30 -> deduccionesDiscapacidad = 0.15
@@ -231,7 +236,7 @@ private fun calculoDuccionesDiscapacidad (gradoDiscapacidad: Int): Double {
     return deduccionesDiscapacidad
 }
 
-private fun calculoDeduccionesHijo (numeroHijos: Int): Double {
+internal fun calculoDeduccionesHijo (numeroHijos: Int): Double {
     var deduccionesHijo = 0.0
     when (numeroHijos) {
         in 1..2 -> deduccionesHijo = 0.05
@@ -255,6 +260,7 @@ private fun calculoDeduccionesHijo (numeroHijos: Int): Double {
      val irpfPorcentaje = irpf * 100
      val aPagar = salarioAnual * irpf
 
+    // Suponemos que el irpf a pagar se divide en los diferenes salarios al año
      val irpfMensual = aPagar / numeroDePagas
      val salarioNeto = (salarioAnual / numeroDePagas) - irpfMensual
 
@@ -262,8 +268,9 @@ private fun calculoDeduccionesHijo (numeroHijos: Int): Double {
     val deducionDiscapacidad = calculoDuccionesDiscapacidad(gradoDiscapacidad)
     val deduccionHijos = calculoDeduccionesHijo(numeroHijos)
     val deducciones = deducionDiscapacidad + deduccionHijos
-    // Suponemos que las deducciones son un porcentaje del salario neto y lo sumamos al salario neto por ser una "ayuda" al trabajador
-    val salarioNetoConDeducciones = salarioNeto + (salarioNeto * deducciones)
+
+    // Suponemos que las deducciones son un porcentaje del irpf a pagar MENSUAL y lo sumamos al salario neto por ser una "ayuda" al trabajador
+    val salarioNetoConDeducciones = salarioNeto + (irpfMensual * deducciones)
 
 
 
@@ -289,14 +296,13 @@ private fun calculoDeduccionesHijo (numeroHijos: Int): Double {
             CuadranteInfo (
                 titulo = stringResource(R.string.titulo_retencion_irpf),
                 descripcion =("Se le retenerá un $irpfPorcentaje%." +
-                        " Total a pagar $aPagar€"),
+                        "\nA pagar $aPagar€"),
                 colorFondo = Color(0xFFB69DF8),
                 modifier = Modifier.weight(1f)
             )
             CuadranteInfo(
                 titulo = stringResource(R.string.titulo_deducciones),
-                descripcion = ("Por incapacidad $deducciones%." +
-                        " Por hijos $deduccionHijos%."),
+                descripcion = ("Por incapacidad $deducionDiscapacidad%."+"\nPor hijos $deduccionHijos%."),
                 colorFondo = Color(0xFFF6EDFF),
                 modifier = Modifier.weight(1f)
             )
@@ -329,7 +335,7 @@ fun CuadranteInfo(
         Text(
             text = descripcion,
             textAlign = TextAlign.Justify
-        )
+            )
 
      }
     }
