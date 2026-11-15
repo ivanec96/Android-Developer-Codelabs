@@ -12,7 +12,7 @@ Apps Android desarrolladas en **Kotlin** con **Jetpack Compose**, siguiendo los 
 | [HappyBirthday](HappyBirthday) | Composables de texto e imagen, layouts con `Column` y `Row` |
 | [LearnTogether](LearnTogether) | Maquetación de un artículo: imagen, títulos y párrafos con estilos |
 | [TaskCompleted](TaskCompleted) | Pantalla centrada con imagen y texto, alineación y espaciado |
-| [CuadranteCompose](CuandranteCompose) | Pantalla dividida en cuatro cuadrantes con `Modifier.weight` |
+| [CuadranteCompose](CuadranteCompose) | Pantalla dividida en cuatro cuadrantes con `Modifier.weight` |
 | [Calculadora](Calculadora) | Interfaz de entrada de datos y gestión de estado |
 
 <!-- Añade aquí capturas de pantalla: crea una carpeta /screenshots y enlázalas así:
